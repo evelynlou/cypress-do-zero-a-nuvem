@@ -8,6 +8,8 @@ describe('Central de Atendimento ao Cliente TAT', () => {
   })
 
   it('Preencher os campos obrigatórios e envia o formulário', () => {
+    cy.clock()
+
     const longText = Cypress._.repeat('Testando', 10) 
 
     cy.get('#firstName').type('Evelyn')
@@ -17,6 +19,10 @@ describe('Central de Atendimento ao Cliente TAT', () => {
     cy.contains('button', 'Enviar').click()
 
     cy.get('.success').should('be.visible')
+
+    cy.tick(3000)
+
+    cy.get('.success').should('not.be.visible')
   })
 
   it('Exibe mensagem de error ao submeter o formulário com um email com formatação inválida', () => {
@@ -156,6 +162,52 @@ describe('Central de Atendimento ao Cliente TAT', () => {
     .click()
     
     cy.contains('h1', 'CAC TAT - Política de Privacidade')
+      .should('be.visible')
+  })
+
+  it('exibe e oculta as mensagens de sucesso e erro usando .invoke()', () => {
+  cy.get('.success')
+    .should('not.be.visible')
+    .invoke('show')
+    .should('be.visible')
+    .and('contain', 'Mensagem enviada com sucesso.')
+    .invoke('hide')
+    .should('not.be.visible')
+  cy.get('.error')
+    .should('not.be.visible')
+    .invoke('show')
+    .should('be.visible')
+    .and('contain', 'Valide os campos obrigatórios!')
+    .invoke('hide')
+    .should('not.be.visible')
+  })
+
+  it('Preenche o campo da área de texto usando o comando invoke', () => {
+    cy.get('#open-text-area')
+      .invoke('val', 'teste')
+      .should('have.value', 'teste')
+  })
+
+  it('Faz uma requisição HTTP', () => {
+    cy.request('https://cac-tat-v3.s3.eu-central-1.amazonaws.com/index.html')
+      .as('getRequest')
+      .its('status')
+      .should('be.equal', 200)
+    cy.get('@getRequest')
+      .its('statusText')
+      .should('be.equal', 'OK')
+    cy.get('@getRequest')
+      .its('body')
+      .should('include', 'CAC TAT')
+  })
+
+  it.only('encontrar o gato escondido', () => {
+    cy.get('#cat')
+      .should('not.be.visible')
+      .invoke('show')
+      .should('be.visible')
+    cy.get('#title')
+      .invoke('text', 'CAT TAT')
       .should('be.visible')
   })
 })
