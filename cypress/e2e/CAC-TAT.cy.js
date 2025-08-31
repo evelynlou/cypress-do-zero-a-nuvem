@@ -201,7 +201,7 @@ describe('Central de Atendimento ao Cliente TAT', () => {
       .should('include', 'CAC TAT')
   })
 
-  it.only('encontrar o gato escondido', () => {
+  it('encontrar o gato escondido', () => {
     cy.get('#cat')
       .should('not.be.visible')
       .invoke('show')
